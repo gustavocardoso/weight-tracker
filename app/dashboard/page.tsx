@@ -7,7 +7,7 @@ import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
 import { formatDate, formatWeight } from '@/lib/utils';
-import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon } from 'lucide-react';
+import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 interface WeightEntry {
@@ -23,6 +23,16 @@ export default function DashboardPage() {
   const [weights, setWeights] = useState<WeightEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [goalWeight, setGoalWeight] = useState<number | null>(null);
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [goalInput, setGoalInput] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [periodFilter, setPeriodFilter] = useState<'7' | '30' | '90' | 'all'>('all');
+  const [editForm, setEditForm] = useState({
+    date: '',
+    weight: '',
+    notes: '',
+  });
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     weight: '',
@@ -31,6 +41,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchWeights();
+    fetchGoal();
   }, []);
 
   const fetchWeights = async () => {
@@ -46,6 +57,40 @@ export default function DashboardPage() {
       console.error('Error fetching weights:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGoal = async () => {
+    try {
+      const response = await fetch('/api/user/goal');
+      if (response.ok) {
+        const data = await response.json();
+        setGoalWeight(data.goalWeight);
+        setGoalInput(data.goalWeight || '');
+      }
+    } catch (error) {
+      console.error('Error fetching goal:', error);
+    }
+  };
+
+  const handleSaveGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/user/goal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goalWeight: goalInput ? parseFloat(goalInput) : null,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGoalWeight(data.goalWeight);
+        setShowGoalForm(false);
+      }
+    } catch (error) {
+      console.error('Error saving goal:', error);
     }
   };
 
@@ -92,17 +137,71 @@ export default function DashboardPage() {
     }
   };
 
+  const handleEdit = (entry: WeightEntry) => {
+    setEditingId(entry.id);
+    setEditForm({
+      date: entry.date,
+      weight: entry.weight.toString(),
+      notes: entry.notes || '',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditForm({ date: '', weight: '', notes: '' });
+  };
+
+  const handleUpdateWeight = async (id: number) => {
+    try {
+      const response = await fetch('/api/weights', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          date: editForm.date,
+          weight: parseFloat(editForm.weight),
+          notes: editForm.notes,
+        }),
+      });
+
+      if (response.ok) {
+        setEditingId(null);
+        setEditForm({ date: '', weight: '', notes: '' });
+        fetchWeights();
+      }
+    } catch (error) {
+      console.error('Error updating weight:', error);
+    }
+  };
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
   };
 
+  const getFilteredWeights = () => {
+    if (periodFilter === 'all') return weights;
+    
+    const now = new Date();
+    const days = parseInt(periodFilter);
+    const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    
+    return weights.filter(w => new Date(w.date) >= cutoffDate);
+  };
+
+  const filteredWeights = getFilteredWeights();
+
   const currentWeight = weights[0]?.weight;
   const previousWeight = weights[1]?.weight;
   const weightDiff = currentWeight && previousWeight ? currentWeight - previousWeight : null;
-  const minWeight = weights.length > 0 ? Math.min(...weights.map(w => w.weight)) : 0;
-  const maxWeight = weights.length > 0 ? Math.max(...weights.map(w => w.weight)) : 0;
-  const avgWeight = weights.length > 0 ? weights.reduce((sum, w) => sum + w.weight, 0) / weights.length : 0;
+  const minWeight = filteredWeights.length > 0 ? Math.min(...filteredWeights.map(w => w.weight)) : 0;
+  const maxWeight = filteredWeights.length > 0 ? Math.max(...filteredWeights.map(w => w.weight)) : 0;
+  const avgWeight = filteredWeights.length > 0 ? filteredWeights.reduce((sum, w) => sum + w.weight, 0) / filteredWeights.length : 0;
+
+  const goalProgress = currentWeight && goalWeight 
+    ? Math.round(((maxWeight - currentWeight) / (maxWeight - goalWeight)) * 100)
+    : null;
+  const weightToGoal = currentWeight && goalWeight ? currentWeight - goalWeight : null;
 
   if (loading) {
     return (
@@ -149,6 +248,31 @@ export default function DashboardPage() {
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
+          </div>
+        </div>
+
+        {/* Period Filter */}
+        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
+          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Period:</span>
+          <div className="flex gap-2">
+            {[
+              { value: '7' as const, label: '7 Days' },
+              { value: '30' as const, label: '30 Days' },
+              { value: '90' as const, label: '90 Days' },
+              { value: 'all' as const, label: 'All Time' },
+            ].map((period) => (
+              <button
+                key={period.value}
+                onClick={() => setPeriodFilter(period.value)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  periodFilter === period.value
+                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/25'
+                    : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
+                }`}
+              >
+                {period.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -224,14 +348,128 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Goal Weight Card */}
+        <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                <Target className="w-5 h-5 text-purple-400" />
+                Weight Goal
+              </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowGoalForm(!showGoalForm)}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+              >
+                {goalWeight ? 'Edit Goal' : 'Set Goal'}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {showGoalForm ? (
+              <form onSubmit={handleSaveGoal} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Target Weight (kg)
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={goalInput}
+                    onChange={(e) => setGoalInput(e.target.value)}
+                    placeholder="75.0"
+                    className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Leave empty to remove goal
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    type="submit"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  >
+                    Save Goal
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowGoalForm(false)}
+                    className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : goalWeight && currentWeight ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current</div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatWeight(currentWeight)}</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Goal</div>
+                    <div className="text-2xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
+                  </div>
+                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Remaining</div>
+                    <div className={`text-2xl font-bold ${weightToGoal && weightToGoal > 0 ? 'text-orange-400' : 'text-green-400'}`}>
+                      {weightToGoal !== null ? `${Math.abs(weightToGoal).toFixed(1)} kg` : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+                
+                {goalProgress !== null && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-300">Progress</span>
+                      <span className="font-medium text-purple-400">{Math.max(0, Math.min(100, goalProgress))}%</span>
+                    </div>
+                    <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                        style={{ width: `${Math.max(0, Math.min(100, goalProgress))}%` }}
+                      />
+                    </div>
+                    {goalProgress >= 100 && (
+                      <p className="text-sm text-green-400 flex items-center gap-2 mt-2">
+                        <Target className="w-4 h-4" />
+                        Congratulations! You've reached your goal! 🎉
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
+                  <Target className="w-8 h-8 text-purple-400" />
+                </div>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {goalWeight ? 'Add a weight entry to see your progress' : 'Set your weight goal to track your progress'}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Chart Section */}
         <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
           <CardHeader>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-400" />
-                Weight History
-              </CardTitle>
+              <div className="space-y-1">
+                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-blue-400" />
+                  Weight History
+                </CardTitle>
+                {periodFilter !== 'all' && filteredWeights.length > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Showing {filteredWeights.length} {filteredWeights.length === 1 ? 'entry' : 'entries'} from the last {periodFilter} days
+                  </p>
+                )}
+              </div>
               <Button 
                 onClick={() => setShowAddForm(!showAddForm)}
                 className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/25"
@@ -322,16 +560,18 @@ export default function DashboardPage() {
               </form>
             )}
 
-            {weights.length > 0 ? (
+            {filteredWeights.length > 0 ? (
               <div className="mt-4">
-                <WeightChart data={weights} theme={theme} />
+                <WeightChart data={filteredWeights} theme={theme} />
               </div>
             ) : (
               <div className="text-center py-12">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-zinc-800/50 rounded-full mb-4">
                   <Weight className="w-8 h-8 text-gray-400 dark:text-gray-400" />
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">No weight records yet. Add your first entry!</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {weights.length > 0 ? 'No records in this period.' : 'No weight records yet. Add your first entry!'}
+                </p>
               </div>
             )}
           </CardContent>
@@ -351,41 +591,116 @@ export default function DashboardPage() {
                 {weights.map((entry, index) => (
                   <div
                     key={entry.id}
-                    className="flex items-center justify-between p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
+                    className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                          <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
-                          <span className="font-medium">{formatDate(entry.date)}</span>
-                        </div>
-                        {index === 0 && (
-                          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
-                            Latest
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                          <Scale className="w-5 h-5 text-cyan-400" />
-                          {formatWeight(entry.weight)}
-                        </div>
-                        {entry.notes && (
-                          <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
-                            <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                            <span>{entry.notes}</span>
+                    {editingId === entry.id ? (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                              <Calendar className="w-3 h-3" />
+                              Date
+                            </label>
+                            <Input
+                              type="date"
+                              value={editForm.date}
+                              onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                            />
                           </div>
-                        )}
+                          <div className="space-y-2">
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                              <Scale className="w-3 h-3" />
+                              Weight (kg)
+                            </label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={editForm.weight}
+                              onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
+                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                              <StickyNote className="w-3 h-3" />
+                              Notes
+                            </label>
+                            <Input
+                              type="text"
+                              value={editForm.notes}
+                              onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleUpdateWeight(entry.id)}
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-8 text-xs"
+                          >
+                            <Check className="w-3 h-3 mr-1" />
+                            Save
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEdit}
+                            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 h-8 text-xs"
+                          >
+                            <X className="w-3 h-3 mr-1" />
+                            Cancel
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(entry.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-500/10 hover:text-red-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
+                              <span className="font-medium">{formatDate(entry.date)}</span>
+                            </div>
+                            {index === 0 && (
+                              <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
+                                Latest
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                              <Scale className="w-5 h-5 text-cyan-400" />
+                              {formatWeight(entry.weight)}
+                            </div>
+                            {entry.notes && (
+                              <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                <span>{entry.notes}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(entry)}
+                            className="hover:bg-blue-500/10 hover:text-blue-400"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(entry.id)}
+                            className="hover:bg-red-500/10 hover:text-red-400"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
