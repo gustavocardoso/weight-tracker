@@ -5,8 +5,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('pt-BR');
+  if (typeof date === 'string') {
+    // Parse date as local date, not UTC
+    const [year, month, day] = date.split('T')[0].split('-');
+    const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return d.toLocaleDateString('pt-BR');
+  }
+  return date.toLocaleDateString('pt-BR');
 }
 
 export function formatWeight(weight: number): string {

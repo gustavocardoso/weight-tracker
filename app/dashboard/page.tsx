@@ -251,30 +251,123 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Period Filter */}
-        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
-          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Period:</span>
-          <div className="flex gap-2">
-            {[
-              { value: '7' as const, label: '7 Days' },
-              { value: '30' as const, label: '30 Days' },
-              { value: '90' as const, label: '90 Days' },
-              { value: 'all' as const, label: 'All Time' },
-            ].map((period) => (
-              <button
-                key={period.value}
-                onClick={() => setPeriodFilter(period.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  periodFilter === period.value
-                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/25'
-                    : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
-                }`}
-              >
-                {period.label}
-              </button>
-            ))}
+        {/* Period Filter & Add Weight Button */}
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Period:</span>
+            <div className="flex gap-2">
+              {[
+                { value: '7' as const, label: '7 Days' },
+                { value: '30' as const, label: '30 Days' },
+                { value: '90' as const, label: '90 Days' },
+                { value: 'all' as const, label: 'All Time' },
+              ].map((period) => (
+                <button
+                  key={period.value}
+                  onClick={() => setPeriodFilter(period.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    periodFilter === period.value
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                      : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
+                  }`}
+                >
+                  {period.label}
+                </button>
+              ))}
+            </div>
           </div>
+          <Button 
+            onClick={() => setShowAddForm(!showAddForm)}
+            className={showAddForm 
+              ? "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-md shadow-red-500/20"
+              : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md shadow-green-500/20 scale-105 hover:scale-110 transition-transform duration-200"
+            }
+          >
+            {showAddForm ? (
+              <>
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5 mr-2" />
+                Add Weight
+              </>
+            )}
+          </Button>
         </div>
+
+        {/* Add Weight Form */}
+        {showAddForm && (
+          <form onSubmit={handleAddWeight} className="p-6 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700 animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Date
+                </label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Weight (kg)
+                </label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={formData.weight}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weight: e.target.value })
+                  }
+                  placeholder="75.5"
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <StickyNote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Notes (optional)
+                </label>
+                <Input
+                  type="text"
+                  value={formData.notes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder="Add a note..."
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-gray-900 dark:text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Save Entry
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddForm(false)}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-slate-700/50"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -458,108 +551,19 @@ export default function DashboardPage() {
         {/* Chart Section */}
         <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
           <CardHeader>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="space-y-1">
-                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-400" />
-                  Weight History
-                </CardTitle>
-                {periodFilter !== 'all' && filteredWeights.length > 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Showing {filteredWeights.length} {filteredWeights.length === 1 ? 'entry' : 'entries'} from the last {periodFilter} days
-                  </p>
-                )}
-              </div>
-              <Button 
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/25"
-              >
-                {showAddForm ? (
-                  <>
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Weight
-                  </>
-                )}
-              </Button>
+            <div className="space-y-1">
+              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-400" />
+                Weight History
+              </CardTitle>
+              {periodFilter !== 'all' && filteredWeights.length > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Showing {filteredWeights.length} {filteredWeights.length === 1 ? 'entry' : 'entries'} from the last {periodFilter} days
+                </p>
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            {showAddForm && (
-              <form onSubmit={handleAddWeight} className="mb-6 p-6 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700 animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Date
-                    </label>
-                    <Input
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) =>
-                        setFormData({ ...formData, date: e.target.value })
-                      }
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Weight (kg)
-                    </label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      value={formData.weight}
-                      onChange={(e) =>
-                        setFormData({ ...formData, weight: e.target.value })
-                      }
-                      placeholder="75.5"
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <StickyNote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Notes (optional)
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.notes}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notes: e.target.value })
-                      }
-                      placeholder="Add a note..."
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-6">
-                  <Button 
-                    type="submit"
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-gray-900 dark:text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Save Entry
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAddForm(false)}
-                    className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-slate-700/50"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            )}
-
             {filteredWeights.length > 0 ? (
               <div className="mt-4">
                 <WeightChart data={filteredWeights} theme={theme} />
