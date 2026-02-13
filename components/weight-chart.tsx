@@ -43,7 +43,7 @@ export function WeightChart({ data, theme = 'light' }: WeightChartProps) {
           tickLine={false}
         />
         <Tooltip
-          formatter={(value: number) => [formatWeight(value), 'Weight']}
+          formatter={(value: number | undefined) => value !== undefined ? [formatWeight(value), 'Weight'] : ['N/A', 'Weight']}
           labelFormatter={(label) => formatDate(label)}
           contentStyle={{
             backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',

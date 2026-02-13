@@ -76,6 +76,49 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await getSession();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Não autenticado' },
+        { status: 401 }
+      );
+    }
+
+    const { id, date, weight, notes } = await request.json();
+
+    if (!id || !date || !weight) {
+      return NextResponse.json(
+        { error: 'ID, data e peso são obrigatórios' },
+        { status: 400 }
+      );
+    }
+
+    const stmt = db.prepare(`
+      UPDATE weights 
+      SET date = ?, weight = ?, notes = ?
+      WHERE id = ? AND user_id = ?
+    `);
+    
+    stmt.run(date, weight, notes || null, id, user.id);
+
+    return NextResponse.json({
+      id,
+      date,
+      weight,
+      notes,
+    });
+  } catch (error) {
+    console.error('Update weight error:', error);
+    return NextResponse.json(
+      { error: 'Erro ao atualizar peso' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getSession();
