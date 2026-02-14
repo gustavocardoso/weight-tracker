@@ -29,13 +29,13 @@ export default function PrivacyPage() {
           
           {/* Page Title Row */}
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
-                <Shield className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+                <Shield className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
+              <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Privacy Policy</h1>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 ml-12">Last updated: February 14, 2026</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">Last updated: February 14, 2026</p>
           </div>
         </div>
 

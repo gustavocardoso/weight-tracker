@@ -283,13 +283,13 @@ export default function DashboardPage() {
           
           {/* Page Title Row */}
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
-                <Activity className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+                <Activity className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 ml-12">Track your progress and reach your goals</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">Track your progress and reach your goals</p>
           </div>
         </div>
 
