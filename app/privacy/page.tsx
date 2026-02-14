@@ -12,22 +12,22 @@ export default function PrivacyPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-start gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-8">
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 mt-1"
+            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 flex-shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
+              <Shield className="w-6 h-6 text-white" />
             </div>
-            <p className="text-gray-500 dark:text-gray-400 ml-14">Last updated: February 14, 2026</p>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Last updated: February 14, 2026</p>
+            </div>
           </div>
         </div>
 
