@@ -12,11 +12,11 @@ export default function PrivacyPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-start gap-4 mb-8">
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 mt-1"
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
