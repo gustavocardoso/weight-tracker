@@ -24,7 +24,23 @@ db.exec(`
     UNIQUE(user_id, date)
   );
 
+  CREATE TABLE IF NOT EXISTS measurements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    chest REAL,
+    waist REAL,
+    hips REAL,
+    thigh REAL,
+    arm REAL,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE(user_id, date)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_weights_user_date ON weights(user_id, date DESC);
+  CREATE INDEX IF NOT EXISTS idx_measurements_user_date ON measurements(user_id, date DESC);
 `);
 
 export default db;

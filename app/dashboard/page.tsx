@@ -6,8 +6,10 @@ import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
+import { MeasurementsChart } from '@/components/measurements-chart';
+import { Footer } from '@/components/footer';
 import { formatDate, formatWeight } from '@/lib/utils';
-import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check } from 'lucide-react';
+import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check, Ruler } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 interface WeightEntry {
@@ -17,10 +19,22 @@ interface WeightEntry {
   notes?: string;
 }
 
+interface Measurement {
+  id: number;
+  date: string;
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  thigh?: number;
+  arm?: number;
+  notes?: string;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [weights, setWeights] = useState<WeightEntry[]>([]);
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [goalWeight, setGoalWeight] = useState<number | null>(null);
@@ -42,6 +56,7 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchWeights();
     fetchGoal();
+    fetchMeasurements();
   }, []);
 
   const fetchWeights = async () => {
@@ -70,6 +85,18 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error fetching goal:', error);
+    }
+  };
+
+  const fetchMeasurements = async () => {
+    try {
+      const response = await fetch('/api/measurements');
+      if (response.ok) {
+        const data = await response.json();
+        setMeasurements(data.measurements);
+      }
+    } catch (error) {
+      console.error('Error fetching measurements:', error);
     }
   };
 
@@ -229,9 +256,17 @@ export default function DashboardPage() {
             <p className="text-gray-500 dark:text-gray-400 ml-14">Track your progress and reach your goals</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/measurements')}
+              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+            >
+              <Ruler className="w-4 h-4 mr-2" />
+              Measurements
+            </Button>
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200"
+              className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -251,30 +286,123 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Period Filter */}
-        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start">
-          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Period:</span>
-          <div className="flex gap-2">
-            {[
-              { value: '7' as const, label: '7 Days' },
-              { value: '30' as const, label: '30 Days' },
-              { value: '90' as const, label: '90 Days' },
-              { value: 'all' as const, label: 'All Time' },
-            ].map((period) => (
-              <button
-                key={period.value}
-                onClick={() => setPeriodFilter(period.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  periodFilter === period.value
-                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/25'
-                    : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
-                }`}
-              >
-                {period.label}
-              </button>
-            ))}
+        {/* Period Filter & Add Weight Button */}
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Period:</span>
+            <div className="flex gap-2">
+              {[
+                { value: '7' as const, label: '7 Days' },
+                { value: '30' as const, label: '30 Days' },
+                { value: '90' as const, label: '90 Days' },
+                { value: 'all' as const, label: 'All Time' },
+              ].map((period) => (
+                <button
+                  key={period.value}
+                  onClick={() => setPeriodFilter(period.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                    periodFilter === period.value
+                      ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                      : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
+                  }`}
+                >
+                  {period.label}
+                </button>
+              ))}
+            </div>
           </div>
+          <Button 
+            onClick={() => setShowAddForm(!showAddForm)}
+            className={showAddForm 
+              ? "bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-md shadow-red-500/20"
+              : "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md shadow-green-500/20 scale-105 hover:scale-110 transition-transform duration-200"
+            }
+          >
+            {showAddForm ? (
+              <>
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5 mr-2" />
+                Add Weight
+              </>
+            )}
+          </Button>
         </div>
+
+        {/* Add Weight Form */}
+        {showAddForm && (
+          <form onSubmit={handleAddWeight} className="p-6 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700 animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Date
+                </label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Weight (kg)
+                </label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={formData.weight}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weight: e.target.value })
+                  }
+                  placeholder="75.5"
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                  <StickyNote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  Notes (optional)
+                </label>
+                <Input
+                  type="text"
+                  value={formData.notes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder="Add a note..."
+                  className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <Button 
+                type="submit"
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-gray-900 dark:text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Save Entry
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddForm(false)}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-slate-700/50"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -402,43 +530,63 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </form>
-            ) : goalWeight && currentWeight ? (
+            ) : goalWeight ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current</div>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatWeight(currentWeight)}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Goal</div>
-                    <div className="text-2xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Remaining</div>
-                    <div className={`text-2xl font-bold ${weightToGoal && weightToGoal > 0 ? 'text-orange-400' : 'text-green-400'}`}>
-                      {weightToGoal !== null ? `${Math.abs(weightToGoal).toFixed(1)} kg` : 'N/A'}
+                {currentWeight ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatWeight(currentWeight)}</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Goal</div>
+                        <div className="text-2xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Remaining</div>
+                        <div className={`text-2xl font-bold ${weightToGoal && weightToGoal > 0 ? 'text-orange-400' : 'text-green-400'}`}>
+                          {weightToGoal !== null ? `${Math.abs(weightToGoal).toFixed(1)} kg` : 'N/A'}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                {goalProgress !== null && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">Progress</span>
-                      <span className="font-medium text-purple-400">{Math.max(0, Math.min(100, goalProgress))}%</span>
-                    </div>
-                    <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-                        style={{ width: `${Math.max(0, Math.min(100, goalProgress))}%` }}
-                      />
-                    </div>
-                    {goalProgress >= 100 && (
-                      <p className="text-sm text-green-400 flex items-center gap-2 mt-2">
-                        <Target className="w-4 h-4" />
-                        Congratulations! You've reached your goal! 🎉
-                      </p>
+                    
+                    {goalProgress !== null && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">Progress</span>
+                          <span className="font-medium text-purple-400">{Math.max(0, Math.min(100, goalProgress))}%</span>
+                        </div>
+                        <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                            style={{ width: `${Math.max(0, Math.min(100, goalProgress))}%` }}
+                          />
+                        </div>
+                        {goalProgress >= 100 && (
+                          <p className="text-sm text-green-400 flex items-center gap-2 mt-2">
+                            <Target className="w-4 h-4" />
+                            Congratulations! You've reached your goal! 🎉
+                          </p>
+                        )}
+                      </div>
                     )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
+                      <Target className="w-8 h-8 text-purple-400" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="text-center p-4 bg-purple-500/5 rounded-xl border border-purple-500/20 inline-block">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Your Goal</div>
+                        <div className="text-3xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Goal set successfully! 🎯<br />
+                        Add your first weight entry to start tracking progress
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -458,108 +606,19 @@ export default function DashboardPage() {
         {/* Chart Section */}
         <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
           <CardHeader>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="space-y-1">
-                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-400" />
-                  Weight History
-                </CardTitle>
-                {periodFilter !== 'all' && filteredWeights.length > 0 && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Showing {filteredWeights.length} {filteredWeights.length === 1 ? 'entry' : 'entries'} from the last {periodFilter} days
-                  </p>
-                )}
-              </div>
-              <Button 
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/25"
-              >
-                {showAddForm ? (
-                  <>
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Weight
-                  </>
-                )}
-              </Button>
+            <div className="space-y-1">
+              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-400" />
+                Weight History
+              </CardTitle>
+              {periodFilter !== 'all' && filteredWeights.length > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Showing {filteredWeights.length} {filteredWeights.length === 1 ? 'entry' : 'entries'} from the last {periodFilter} days
+                </p>
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            {showAddForm && (
-              <form onSubmit={handleAddWeight} className="mb-6 p-6 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700 animate-fadeIn">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Date
-                    </label>
-                    <Input
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) =>
-                        setFormData({ ...formData, date: e.target.value })
-                      }
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Weight (kg)
-                    </label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      value={formData.weight}
-                      onChange={(e) =>
-                        setFormData({ ...formData, weight: e.target.value })
-                      }
-                      placeholder="75.5"
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                      <StickyNote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                      Notes (optional)
-                    </label>
-                    <Input
-                      type="text"
-                      value={formData.notes}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notes: e.target.value })
-                      }
-                      placeholder="Add a note..."
-                      className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-6">
-                  <Button 
-                    type="submit"
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-gray-900 dark:text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Save Entry
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAddForm(false)}
-                    className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-slate-700/50"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            )}
-
             {filteredWeights.length > 0 ? (
               <div className="mt-4">
                 <WeightChart data={filteredWeights} theme={theme} />
@@ -577,137 +636,175 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Records List */}
-        {weights.length > 0 && (
-          <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
+        {/* Records and Measurements Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Records List */}
+          {weights.length > 0 && (
+            <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-400" />
+                  Recent Records
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-hidden">
+                <div className="h-[600px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                  {weights.map((entry, index) => (
+                    <div
+                      key={entry.id}
+                      className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
+                    >
+                      {editingId === entry.id ? (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <Calendar className="w-3 h-3" />
+                                Date
+                              </label>
+                              <Input
+                                type="date"
+                                value={editForm.date}
+                                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <Scale className="w-3 h-3" />
+                                Weight (kg)
+                              </label>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                value={editForm.weight}
+                                onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <StickyNote className="w-3 h-3" />
+                                Notes
+                              </label>
+                              <Input
+                                type="text"
+                                value={editForm.notes}
+                                onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateWeight(entry.id)}
+                              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-8 text-xs"
+                            >
+                              <Check className="w-3 h-3 mr-1" />
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 h-8 text-xs"
+                            >
+                              <X className="w-3 h-3 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
+                                <span className="font-medium">{formatDate(entry.date)}</span>
+                              </div>
+                              {index === 0 && (
+                                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
+                                  Latest
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Scale className="w-5 h-5 text-cyan-400" />
+                                {formatWeight(entry.weight)}
+                              </div>
+                              {entry.notes && (
+                                <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                  <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                  <span>{entry.notes}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(entry)}
+                              className="hover:bg-blue-500/10 hover:text-blue-400"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(entry.id)}
+                              className="hover:bg-red-500/10 hover:text-red-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Measurements Chart */}
+          <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-400" />
-                Recent Records
+                <Ruler className="w-5 h-5 text-purple-400" />
+                Body Measurements Evolution
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {weights.map((entry, index) => (
-                  <div
-                    key={entry.id}
-                    className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
-                  >
-                    {editingId === entry.id ? (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <Calendar className="w-3 h-3" />
-                              Date
-                            </label>
-                            <Input
-                              type="date"
-                              value={editForm.date}
-                              onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <Scale className="w-3 h-3" />
-                              Weight (kg)
-                            </label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={editForm.weight}
-                              onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <StickyNote className="w-3 h-3" />
-                              Notes
-                            </label>
-                            <Input
-                              type="text"
-                              value={editForm.notes}
-                              onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleUpdateWeight(entry.id)}
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-8 text-xs"
-                          >
-                            <Check className="w-3 h-3 mr-1" />
-                            Save
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleCancelEdit}
-                            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 h-8 text-xs"
-                          >
-                            <X className="w-3 h-3 mr-1" />
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
-                              <span className="font-medium">{formatDate(entry.date)}</span>
-                            </div>
-                            {index === 0 && (
-                              <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
-                                Latest
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                              <Scale className="w-5 h-5 text-cyan-400" />
-                              {formatWeight(entry.weight)}
-                            </div>
-                            {entry.notes && (
-                              <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                <span>{entry.notes}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(entry)}
-                            className="hover:bg-blue-500/10 hover:text-blue-400"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(entry.id)}
-                            className="hover:bg-red-500/10 hover:text-red-400"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+            <CardContent className="flex-1">
+              {measurements.length > 0 ? (
+                <div className="h-[600px]">
+                  <MeasurementsChart data={measurements} theme={theme} />
+                </div>
+              ) : (
+                <div className="text-center py-12 h-[600px] flex flex-col items-center justify-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
+                    <Ruler className="w-8 h-8 text-purple-400" />
                   </div>
-                ))}
-              </div>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                    No measurements yet. Start tracking your body measurements!
+                  </p>
+                  <Button
+                    onClick={() => router.push('/measurements')}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add First Measurement
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
-        )}
+        </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
