@@ -640,17 +640,17 @@ export default function DashboardPage() {
           {weights.length > 0 && (
             <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
               <CardHeader>
-                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-blue-400" />
+                <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-400" />
                   Recent Records
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 overflow-hidden">
-                <div className="h-[600px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                <div className="h-[400px] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent">
                   {weights.map((entry, index) => (
                     <div
                       key={entry.id}
-                      className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
+                      className="p-3 bg-gray-100 dark:bg-zinc-800/50 rounded-lg border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
                     >
                       {editingId === entry.id ? (
                         <div className="space-y-4">
@@ -717,8 +717,8 @@ export default function DashboardPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-1">
-                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                                <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
+                                <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-400" />
                                 <span className="font-medium">{formatDate(entry.date)}</span>
                               </div>
                               {index === 0 && (
@@ -728,14 +728,14 @@ export default function DashboardPage() {
                               )}
                             </div>
                             <div className="flex items-center gap-4">
-                              <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <Scale className="w-5 h-5 text-cyan-400" />
+                              <div className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Scale className="w-4 h-4 text-cyan-400" />
                                 {formatWeight(entry.weight)}
                               </div>
                               {entry.notes && (
-                                <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                  <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                  <span>{entry.notes}</span>
+                                <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                  <StickyNote className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                                  <span className="line-clamp-1">{entry.notes}</span>
                                 </div>
                               )}
                             </div>
@@ -770,18 +770,18 @@ export default function DashboardPage() {
           {/* Measurements Chart */}
           <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
             <CardHeader>
-              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Ruler className="w-5 h-5 text-purple-400" />
+              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                <Ruler className="w-4 h-4 text-purple-400" />
                 Body Measurements Evolution
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1">
               {measurements.length > 0 ? (
-                <div className="h-[600px]">
+                <div className="h-[400px]">
                   <MeasurementsChart data={measurements} theme={theme} />
                 </div>
               ) : (
-                <div className="text-center py-12 h-[600px] flex flex-col items-center justify-center">
+                <div className="text-center py-12 h-[400px] flex flex-col items-center justify-center">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
                     <Ruler className="w-8 h-8 text-purple-400" />
                   </div>
