@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
+import { Footer } from '@/components/footer';
 import { formatDate } from '@/lib/utils';
 import { Ruler, Plus, Trash2, Calendar, StickyNote, X, ArrowLeft, Edit2, Check } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
@@ -543,6 +544,8 @@ export default function MeasurementsPage() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

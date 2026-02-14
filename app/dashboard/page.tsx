@@ -7,6 +7,7 @@ import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
 import { MeasurementsChart } from '@/components/measurements-chart';
+import { Footer } from '@/components/footer';
 import { formatDate, formatWeight } from '@/lib/utils';
 import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check, Ruler } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
@@ -802,6 +803,8 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
