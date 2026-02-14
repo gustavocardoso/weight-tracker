@@ -245,8 +245,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header with background */}
-        <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-8 py-4 mb-6">
+        {/* Header */}
+        <div className="px-4 md:px-8 py-4 mb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <Logo />
             <div className="flex items-center gap-3">

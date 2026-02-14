@@ -12,8 +12,8 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-4xl mx-auto">
-        {/* Header with background */}
-        <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-8 py-4 mb-6">
+        {/* Header */}
+        <div className="px-4 md:px-8 py-4 mb-6">
           <div className="flex justify-between items-center">
             <Logo />
             <Button
