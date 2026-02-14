@@ -57,19 +57,21 @@
 
 ### 📝 Registro de Dados
 
-- [ ] **Notas em registros** - Adicionar contexto aos registros
-  - Campo opcional "note" na tabela weights
-  - Input de texto ao registrar peso
-  - Exibir notas nos cards de histórico
+- [x] **Notas em registros** - Adicionar contexto aos registros
+  - ✅ Campo opcional "notes" na tabela weights
+  - ✅ Input de texto ao registrar peso
+  - ✅ Exibir notas nos cards de histórico
 
-- [ ] **Medidas corporais** - Tracking adicional opcional
-  - Tabela "measurements" (cintura, braço, etc)
-  - Interface para registrar medidas
-  - Gráficos separados por medida
+- [x] **Medidas corporais** - Tracking adicional opcional
+  - ✅ Tabela "measurements" (peito, cintura, quadril, coxa, braço)
+  - ✅ Interface para registrar medidas
+  - ✅ CRUD completo (criar, editar, deletar medidas)
+  - ✅ Página dedicada acessível via dashboard
+  - ✅ Formulário responsivo com múltiplos campos
 
-- [ ] **Horário do registro** - Registrar hora além da data
-  - Adicionar timestamp completo
-  - Útil para ver padrões (manhã vs noite)
+- [x] **Horário do registro** - Registrar hora além da data
+  - ✅ Campo created_at com timestamp completo
+  - ✅ Útil para ver padrões (manhã vs noite)
 
 ### 🎯 Motivação & Gamificação
 
@@ -175,9 +177,18 @@
 
 ---
 
-**Última atualização:** 2026-02-13
+**Última atualização:** 2026-02-14
 
 ## 📝 Changelog
+
+### 2026-02-14 - Features de Registro de Dados Completas ✅
+- ✅ Implementada feature de **Notas em Registros** (campo notes já existia, agora documentado)
+- ✅ Implementada feature de **Medidas Corporais** com tabela dedicada, API CRUD completa e interface responsiva
+- ✅ Implementada feature de **Horário do Registro** com campo created_at timestamp
+- ✅ Adicionado botão "Measurements" no header do dashboard para acesso rápido
+- ✅ Página de medidas com formulário para 5 tipos de medidas (peito, cintura, quadril, coxa, braço)
+- ✅ Edição inline e exclusão de registros de medidas
+- ✅ Interface consistente com o design do dashboard
 
 ### 2026-02-13 - Quick Wins Completos ✅
 - ✅ Implementada feature de **Meta de Peso** com card dedicado, barra de progresso e indicador visual
