@@ -23,11 +23,11 @@ export function Logo() {
       </div>
       
       {/* Logo text - single line */}
-      <div className="flex items-baseline gap-1">
+      <div className="flex items-baseline gap-2">
         <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
           Weight
         </span>
-        <span className="text-lg md:text-xl font-medium text-gray-600 dark:text-gray-400">
+        <span className="text-2xl md:text-3xl font-bold text-gray-600 dark:text-gray-400">
           Tracker
         </span>
       </div>
