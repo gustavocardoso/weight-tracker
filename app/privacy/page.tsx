@@ -30,6 +30,12 @@ export default function PrivacyPage() {
         {/* Content */}
         <div className="px-4 md:px-8 space-y-8">
 
+        {/* Page Title */}
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">Privacy Policy</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Last updated: February 14, 2026</p>
+        </div>
+
         {/* Introduction */}
         <div className="glass p-6 rounded-xl border border-gray-200 dark:border-zinc-700/50">
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
