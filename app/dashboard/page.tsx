@@ -7,7 +7,7 @@ import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
 import { formatDate, formatWeight } from '@/lib/utils';
-import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check } from 'lucide-react';
+import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check, Ruler } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 interface WeightEntry {
@@ -229,9 +229,17 @@ export default function DashboardPage() {
             <p className="text-gray-500 dark:text-gray-400 ml-14">Track your progress and reach your goals</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => router.push('/measurements')}
+              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+            >
+              <Ruler className="w-4 h-4 mr-2" />
+              Measurements
+            </Button>
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200"
+              className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -265,7 +273,7 @@ export default function DashboardPage() {
                 <button
                   key={period.value}
                   onClick={() => setPeriodFilter(period.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
                     periodFilter === period.value
                       ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
                       : 'bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50'
@@ -495,43 +503,63 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </form>
-            ) : goalWeight && currentWeight ? (
+            ) : goalWeight ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current</div>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatWeight(currentWeight)}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Goal</div>
-                    <div className="text-2xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Remaining</div>
-                    <div className={`text-2xl font-bold ${weightToGoal && weightToGoal > 0 ? 'text-orange-400' : 'text-green-400'}`}>
-                      {weightToGoal !== null ? `${Math.abs(weightToGoal).toFixed(1)} kg` : 'N/A'}
+                {currentWeight ? (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Current</div>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{formatWeight(currentWeight)}</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Goal</div>
+                        <div className="text-2xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
+                      </div>
+                      <div className="text-center p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Remaining</div>
+                        <div className={`text-2xl font-bold ${weightToGoal && weightToGoal > 0 ? 'text-orange-400' : 'text-green-400'}`}>
+                          {weightToGoal !== null ? `${Math.abs(weightToGoal).toFixed(1)} kg` : 'N/A'}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                {goalProgress !== null && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">Progress</span>
-                      <span className="font-medium text-purple-400">{Math.max(0, Math.min(100, goalProgress))}%</span>
-                    </div>
-                    <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-                        style={{ width: `${Math.max(0, Math.min(100, goalProgress))}%` }}
-                      />
-                    </div>
-                    {goalProgress >= 100 && (
-                      <p className="text-sm text-green-400 flex items-center gap-2 mt-2">
-                        <Target className="w-4 h-4" />
-                        Congratulations! You've reached your goal! 🎉
-                      </p>
+                    
+                    {goalProgress !== null && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">Progress</span>
+                          <span className="font-medium text-purple-400">{Math.max(0, Math.min(100, goalProgress))}%</span>
+                        </div>
+                        <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                            style={{ width: `${Math.max(0, Math.min(100, goalProgress))}%` }}
+                          />
+                        </div>
+                        {goalProgress >= 100 && (
+                          <p className="text-sm text-green-400 flex items-center gap-2 mt-2">
+                            <Target className="w-4 h-4" />
+                            Congratulations! You've reached your goal! 🎉
+                          </p>
+                        )}
+                      </div>
                     )}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
+                      <Target className="w-8 h-8 text-purple-400" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="text-center p-4 bg-purple-500/5 rounded-xl border border-purple-500/20 inline-block">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Your Goal</div>
+                        <div className="text-3xl font-bold text-purple-400">{formatWeight(goalWeight)}</div>
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Goal set successfully! 🎯<br />
+                        Add your first weight entry to start tracking progress
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
