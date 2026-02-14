@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
+import { MeasurementsChart } from '@/components/measurements-chart';
 import { Footer } from '@/components/footer';
 import { formatDate } from '@/lib/utils';
 import { Ruler, Plus, Trash2, Calendar, StickyNote, X, ArrowLeft, Edit2, Check } from 'lucide-react';
@@ -336,13 +337,30 @@ export default function MeasurementsPage() {
           </form>
         )}
 
+        {/* Measurements Chart */}
+        {measurements.length > 0 && (
+          <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                <Ruler className="w-5 h-5 text-purple-400" />
+                Body Measurements Evolution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[500px]">
+                <MeasurementsChart data={measurements} theme={theme} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Measurements List */}
         {measurements.length > 0 ? (
           <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
             <CardHeader>
               <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Ruler className="w-5 h-5 text-purple-400" />
-                Recent Measurements
+                <Calendar className="w-5 h-5 text-purple-400" />
+                Measurement History
               </CardTitle>
             </CardHeader>
             <CardContent>
