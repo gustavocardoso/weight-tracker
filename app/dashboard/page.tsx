@@ -256,14 +256,6 @@ export default function DashboardPage() {
             <p className="text-gray-500 dark:text-gray-400 ml-14">Track your progress and reach your goals</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/measurements')}
-              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
-            >
-              <Ruler className="w-4 h-4 mr-2" />
-              Measurements
-            </Button>
             <button
               onClick={toggleTheme}
               className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
@@ -275,6 +267,14 @@ export default function DashboardPage() {
                 <Moon className="w-5 h-5" />
               )}
             </button>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/measurements')}
+              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+            >
+              <Ruler className="w-4 h-4 mr-2" />
+              Measurements
+            </Button>
             <Button 
               variant="outline" 
               onClick={handleLogout}
