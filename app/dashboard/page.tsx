@@ -243,11 +243,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-6 mb-8">
-          {/* Logo and Actions Row */}
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header with background */}
+        <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-8 py-4 mb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <Logo />
             <div className="flex items-center gap-3">
@@ -280,18 +279,10 @@ export default function DashboardPage() {
               </Button>
             </div>
           </div>
-          
-          {/* Page Title Row */}
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
-                <Activity className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">Track your progress and reach your goals</p>
-          </div>
         </div>
+
+        {/* Content */}
+        <div className="px-4 md:px-8 space-y-6">
 
         {/* Period Filter & Add Weight Button */}
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -808,6 +799,7 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
 

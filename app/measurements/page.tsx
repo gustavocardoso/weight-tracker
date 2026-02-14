@@ -177,11 +177,10 @@ export default function MeasurementsPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-6 mb-8">
-          {/* Logo and Back Button Row */}
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header with background */}
+        <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-8 py-4 mb-6">
           <div className="flex justify-between items-center">
             <Logo />
             <Button
@@ -193,18 +192,10 @@ export default function MeasurementsPage() {
               Back to Dashboard
             </Button>
           </div>
-          
-          {/* Page Title Row */}
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
-                <Ruler className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Body Measurements</h1>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">Track your body measurements over time</p>
-          </div>
         </div>
+
+        {/* Content */}
+        <div className="px-4 md:px-8 space-y-6">
 
         {/* Add Measurement Button */}
         <div className="flex justify-end">
@@ -569,6 +560,7 @@ export default function MeasurementsPage() {
             </p>
           </div>
         )}
+        </div>
       </div>
 
       <Footer />

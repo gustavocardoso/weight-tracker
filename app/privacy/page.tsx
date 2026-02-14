@@ -10,11 +10,10 @@ export default function PrivacyPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col gap-6 mb-8">
-          {/* Logo and Back Button Row */}
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto">
+        {/* Header with background */}
+        <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 md:px-8 py-4 mb-6">
           <div className="flex justify-between items-center">
             <Logo />
             <Button
@@ -26,18 +25,10 @@ export default function PrivacyPage() {
               Back
             </Button>
           </div>
-          
-          {/* Page Title Row */}
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Privacy Policy</h1>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 ml-8">Last updated: February 14, 2026</p>
-          </div>
         </div>
+
+        {/* Content */}
+        <div className="px-4 md:px-8 space-y-8">
 
         {/* Introduction */}
         <div className="glass p-6 rounded-xl border border-gray-200 dark:border-zinc-700/50">
@@ -223,6 +214,7 @@ export default function PrivacyPage() {
             <p className="font-medium">✓ We NEVER sell your data</p>
             <p className="font-medium">✓ You have full control over your information</p>
           </div>
+        </div>
         </div>
       </div>
 
