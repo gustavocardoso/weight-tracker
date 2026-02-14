@@ -180,7 +180,7 @@ export default function MeasurementsPage() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="px-4 md:px-8 py-4 mb-6">
+        <div className="px-4 md:px-8 py-6 md:py-8 mb-6">
           <div className="flex justify-between items-center">
             <Logo />
             <Button
