@@ -367,10 +367,16 @@ export default function MeasurementsPage() {
         {measurements.length > 0 && (
           <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Ruler className="w-5 h-5 text-purple-400" />
-                Body Measurements Evolution
-              </CardTitle>
+              <div className="flex flex-col gap-2">
+                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                  <Ruler className="w-5 h-5 text-purple-400" />
+                  Body Measurements Evolution
+                </CardTitle>
+                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <StickyNote className="w-3 h-3" />
+                  Tip: Click on the labels below the chart to show/hide specific measurements
+                </p>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="h-[500px]">
