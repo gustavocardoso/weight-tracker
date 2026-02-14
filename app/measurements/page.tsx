@@ -6,6 +6,7 @@ import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { MeasurementsChart } from '@/components/measurements-chart';
+import { Logo } from '@/components/logo';
 import { Footer } from '@/components/footer';
 import { formatDate } from '@/lib/utils';
 import { Ruler, Plus, Trash2, Calendar, StickyNote, X, ArrowLeft, Edit2, Check } from 'lucide-react';
@@ -179,22 +180,29 @@ export default function MeasurementsPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="flex flex-col gap-6 mb-8">
+          {/* Logo and Back Button Row */}
+          <div className="flex justify-between items-center">
+            <Logo />
+            <Button
+              variant="outline"
+              onClick={() => router.push('/dashboard')}
+              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </div>
+          
+          {/* Page Title Row */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard')}
-                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl">
-                <Ruler className="w-6 h-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
+                <Ruler className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Body Measurements</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Body Measurements</h1>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 ml-24">Track your body measurements over time</p>
+            <p className="text-gray-500 dark:text-gray-400 ml-12">Track your body measurements over time</p>
           </div>
         </div>
 

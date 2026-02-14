@@ -7,6 +7,7 @@ import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
 import { MeasurementsChart } from '@/components/measurements-chart';
+import { Logo } from '@/components/logo';
 import { Footer } from '@/components/footer';
 import { formatDate, formatWeight } from '@/lib/utils';
 import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check, Ruler } from 'lucide-react';
@@ -245,44 +246,50 @@ export default function DashboardPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="flex flex-col gap-6 mb-8">
+          {/* Logo and Actions Row */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <Logo />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/measurements')}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+              >
+                <Ruler className="w-4 h-4 mr-2" />
+                Measurements
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+          
+          {/* Page Title Row */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
-                <Activity className="w-6 h-6 text-white" />
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+                <Activity className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Weight Dashboard</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 ml-14">Track your progress and reach your goals</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
-              aria-label="Toggle theme"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-            <Button
-              variant="outline"
-              onClick={() => router.push('/measurements')}
-              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
-            >
-              <Ruler className="w-4 h-4 mr-2" />
-              Measurements
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleLogout}
-              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <p className="text-gray-500 dark:text-gray-400 ml-12">Track your progress and reach your goals</p>
           </div>
         </div>
 
