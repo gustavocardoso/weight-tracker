@@ -21,12 +21,12 @@ export default function PrivacyPage() {
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Last updated: February 14, 2026</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight">Privacy Policy</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Last updated: February 14, 2026</p>
             </div>
           </div>
         </div>
