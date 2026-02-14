@@ -6,6 +6,7 @@ import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card';
 import { WeightChart } from '@/components/weight-chart';
+import { MeasurementsChart } from '@/components/measurements-chart';
 import { formatDate, formatWeight } from '@/lib/utils';
 import { TrendingDown, TrendingUp, Weight, LogOut, Plus, Trash2, Calendar, Scale, StickyNote, Target, Activity, X, Sun, Moon, Edit2, Check, Ruler } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
@@ -17,10 +18,22 @@ interface WeightEntry {
   notes?: string;
 }
 
+interface Measurement {
+  id: number;
+  date: string;
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  thigh?: number;
+  arm?: number;
+  notes?: string;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [weights, setWeights] = useState<WeightEntry[]>([]);
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [goalWeight, setGoalWeight] = useState<number | null>(null);
@@ -42,6 +55,7 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchWeights();
     fetchGoal();
+    fetchMeasurements();
   }, []);
 
   const fetchWeights = async () => {
@@ -70,6 +84,18 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error fetching goal:', error);
+    }
+  };
+
+  const fetchMeasurements = async () => {
+    try {
+      const response = await fetch('/api/measurements');
+      if (response.ok) {
+        const data = await response.json();
+        setMeasurements(data.measurements);
+      }
+    } catch (error) {
+      console.error('Error fetching measurements:', error);
     }
   };
 
@@ -609,136 +635,172 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Records List */}
-        {weights.length > 0 && (
-          <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl">
+        {/* Records and Measurements Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Records List */}
+          {weights.length > 0 && (
+            <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-400" />
+                  Recent Records
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-hidden">
+                <div className="h-[600px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                  {weights.map((entry, index) => (
+                    <div
+                      key={entry.id}
+                      className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
+                    >
+                      {editingId === entry.id ? (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <Calendar className="w-3 h-3" />
+                                Date
+                              </label>
+                              <Input
+                                type="date"
+                                value={editForm.date}
+                                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <Scale className="w-3 h-3" />
+                                Weight (kg)
+                              </label>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                value={editForm.weight}
+                                onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <StickyNote className="w-3 h-3" />
+                                Notes
+                              </label>
+                              <Input
+                                type="text"
+                                value={editForm.notes}
+                                onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                                className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateWeight(entry.id)}
+                              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-8 text-xs"
+                            >
+                              <Check className="w-3 h-3 mr-1" />
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 h-8 text-xs"
+                            >
+                              <X className="w-3 h-3 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
+                                <span className="font-medium">{formatDate(entry.date)}</span>
+                              </div>
+                              {index === 0 && (
+                                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
+                                  Latest
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <Scale className="w-5 h-5 text-cyan-400" />
+                                {formatWeight(entry.weight)}
+                              </div>
+                              {entry.notes && (
+                                <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                  <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                  <span>{entry.notes}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(entry)}
+                              className="hover:bg-blue-500/10 hover:text-blue-400"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(entry.id)}
+                              className="hover:bg-red-500/10 hover:text-red-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Measurements Chart */}
+          <Card className="glass border-gray-200 dark:border-zinc-700/50 shadow-xl flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl text-gray-900 dark:text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-400" />
-                Recent Records
+                <Ruler className="w-5 h-5 text-purple-400" />
+                Body Measurements Evolution
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {weights.map((entry, index) => (
-                  <div
-                    key={entry.id}
-                    className="p-4 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-zinc-700/50 hover:bg-gray-200 dark:hover:bg-zinc-700/50 hover:border-blue-500/30 transition-all duration-200 group"
-                  >
-                    {editingId === entry.id ? (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <Calendar className="w-3 h-3" />
-                              Date
-                            </label>
-                            <Input
-                              type="date"
-                              value={editForm.date}
-                              onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <Scale className="w-3 h-3" />
-                              Weight (kg)
-                            </label>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              value={editForm.weight}
-                              onChange={(e) => setEditForm({ ...editForm, weight: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                              <StickyNote className="w-3 h-3" />
-                              Notes
-                            </label>
-                            <Input
-                              type="text"
-                              value={editForm.notes}
-                              onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                              className="bg-white dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white h-9 text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleUpdateWeight(entry.id)}
-                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-8 text-xs"
-                          >
-                            <Check className="w-3 h-3 mr-1" />
-                            Save
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={handleCancelEdit}
-                            className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 h-8 text-xs"
-                          >
-                            <X className="w-3 h-3 mr-1" />
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-400" />
-                              <span className="font-medium">{formatDate(entry.date)}</span>
-                            </div>
-                            {index === 0 && (
-                              <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full border border-blue-500/30">
-                                Latest
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                              <Scale className="w-5 h-5 text-cyan-400" />
-                              {formatWeight(entry.weight)}
-                            </div>
-                            {entry.notes && (
-                              <div className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                <StickyNote className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                <span>{entry.notes}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(entry)}
-                            className="hover:bg-blue-500/10 hover:text-blue-400"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(entry.id)}
-                            className="hover:bg-red-500/10 hover:text-red-400"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+            <CardContent className="flex-1">
+              {measurements.length > 0 ? (
+                <div className="h-[600px]">
+                  <MeasurementsChart data={measurements} theme={theme} />
+                </div>
+              ) : (
+                <div className="text-center py-12 h-[600px] flex flex-col items-center justify-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-500/10 rounded-full mb-4">
+                    <Ruler className="w-8 h-8 text-purple-400" />
                   </div>
-                ))}
-              </div>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                    No measurements yet. Start tracking your body measurements!
+                  </p>
+                  <Button
+                    onClick={() => router.push('/measurements')}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add First Measurement
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
-        )}
+        </div>
       </div>
     </div>
   );
