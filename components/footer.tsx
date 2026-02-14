@@ -46,13 +46,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a 
-                  href="#privacy" 
+                <Link 
+                  href="/privacy" 
                   className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200 flex items-center gap-1"
                 >
                   <Shield className="w-3 h-3" />
                   Privacy Policy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
