@@ -225,12 +225,7 @@ export default function MeasurementsPage() {
 
         {/* Subheader with Page Title and Add Button */}
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
-              <Ruler className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Body Measurements</h1>
-          </div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Body Measurements</h1>
           <Button 
             onClick={() => setShowAddForm(!showAddForm)}
             className={showAddForm 
