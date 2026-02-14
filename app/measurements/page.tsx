@@ -9,7 +9,7 @@ import { MeasurementsChart } from '@/components/measurements-chart';
 import { Logo } from '@/components/logo';
 import { Footer } from '@/components/footer';
 import { formatDate } from '@/lib/utils';
-import { Ruler, Plus, Trash2, Calendar, StickyNote, X, ArrowLeft, Edit2, Check } from 'lucide-react';
+import { Ruler, Plus, Trash2, Calendar, StickyNote, X, Edit2, Check, Activity, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
 interface Measurement {
@@ -25,7 +25,7 @@ interface Measurement {
 
 export default function MeasurementsPage() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -165,6 +165,11 @@ export default function MeasurementsPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -181,16 +186,37 @@ export default function MeasurementsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="px-4 md:px-8 py-6 md:py-8 mb-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <Logo />
-            <Button
-              variant="outline"
-              onClick={() => router.push('/dashboard')}
-              className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-lg bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700/50 transition-all duration-200 cursor-pointer"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/dashboard')}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-300"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
 
